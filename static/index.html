@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Socket.IO Shell</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font: 13px Helvetica, Arial;
+        }
+
+        form {
+            background: #000;
+            padding: 3px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        form input {
+            border: 0;
+            padding: 10px;
+            width: 90%;
+            margin-right: .5%;
+        }
+
+        form button {
+            width: 9%;
+            background: rgb(130, 224, 255);
+            border: none;
+            padding: 10px;
+        }
+
+        #output {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        #output li {
+            padding: 5px 10px;
+        }
+
+        #output li pre {
+            font: 13px "Source Code Pro", monospace;
+        }
+
+        #output li:nth-child(odd) {
+            background: #eee;
+        }
+    </style>
+</head>
+<body>
+<ul id="output"></ul>
+<form id="form">
+    <input type="text" id="command">
+    <button type="submit">Send</button>
+</form>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.0/jquery.min.js"
+        integrity="sha384-JUMjoW8OzDJw4oFpWIB2Bu/c6768ObEthBMVSiIx4ruBIEdyNSUQAjJNFqT5pnJ6"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"
+        integrity="sha384-XqoIiVGwmT9hBo2tavpqOTBzpgePfm7AuFqEqsxGN/YmIxQitrfYwOoFwsS1AbV+"
+        crossorigin="anonymous"></script>
+<script>
+    $(function () {
+        let socket = io();
+
+        let $form = $('#form');
+        let $messages = $('#output');
+        let $command = $('#command');
+
+        $form.submit(function (e) {
+            e.preventDefault();
+            socket.emit('command', $('#command').val());
+            $command.val('');
+            return false;
+        });
+        socket.on('stdout', function (data) {
+            console.log(data);
+            $messages.append($('<li>').append($('<pre>').text(data)));
+        });
+        socket.on('stderr', function (data) {
+            console.log(data);
+            $messages.append($('<li>').append($('<pre>').text(data)));
+        });
+    });
+</script>
+</body>
+</html>
